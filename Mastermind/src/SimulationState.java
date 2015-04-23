@@ -10,7 +10,7 @@ public class SimulationState {
 	public ArrayList<Color> colorChoices;
 	public ArrayList<ArrayList<Color>> historyOfGuesses, alreadyVisitedStates;
 	
-	public SimulationState(int numColors, int numSlots, boolean spectateGame, int numIterations)
+	public SimulationState(int numSlots, int numColors, boolean spectateGame, int numIterations)
 	{
 		this.numColors = numColors;
 		this.numIterations = numIterations;
