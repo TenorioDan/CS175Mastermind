@@ -1,21 +1,25 @@
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 //Author: Joey Shepard 58868407
 public class FiveGuessSolver {
 	
-	public int numColors, numSlots, numIterations, totalGuesses, bestEval, shortestGame, longestGame;
-	public boolean spectateGame, guessAgain;
+	public int numColors, numSlots, numIterations, totalGuesses, bestEval, shortestGame, longestGame, currentEval;
+	public boolean spectateGame, guessAgain, firstGuess;
 	public ArrayList<Color> answer, bestGuess;
 	public ArrayList<Integer> slotChoices;
 	public ArrayList<Color> colorChoices;
 	public ArrayList<ArrayList<Color>> historyOfGuesses, alreadyVisitedStates;
+	private Set<ArrayList<Color>> masterSet, sSet;
 	
-	public FiveGuessSolver(int numSlots, int numColors, boolean spectateGame, int numIterations)
+	public FiveGuessSolver(boolean spectateGame, int numIterations)
 	{
-		this.numColors = numColors;
+		masterSet = new HashSet<ArrayList<Color>>();
+		this.numColors = 6;
 		this.numIterations = numIterations;
 		this.spectateGame = spectateGame;
-		this.numSlots = numSlots;	
+		this.numSlots = 4;	
 		totalGuesses = 0;
 		bestEval = 0;
 		slotChoices = new ArrayList<Integer>();
@@ -28,6 +32,8 @@ public class FiveGuessSolver {
 	
 	public void runSimulation()
 	{
+		populateMasterSets();
+		
 		for (int i = 0; i < numIterations; i++)
 		{			
 			if (spectateGame)
@@ -39,23 +45,51 @@ public class FiveGuessSolver {
 
 			//clear history in between games
 			historyOfGuesses.clear();			
-			bestGuess.clear();
-			alreadyVisitedStates.clear();
-			bestEval = 0;
-			resetSlotChoices();			
-			guessAgain = true;
+		
+			resetSlotChoices();	
+			firstGuess = false;
 			
 			//game loop
 			while (true)
 			{
-				ArrayList<Color> computerGuess = calculateGuess();		
-				historyOfGuesses.add(computerGuess);
-				alreadyVisitedStates.add(computerGuess);
+				ArrayList<Color> computerGuess = new ArrayList<Color>();
 				
-				if (spectateGame)
-					System.out.println("Guess #" + historyOfGuesses.size() + ": " + computerGuess 
-							+ " ANSWER: " + answer + " Best Eval: " + bestEval);
+				if (firstGuess)
+				{
+					Color one = colorChoices.get((int)(Math.random() * colorChoices.size()));
+					Color two = colorChoices.get((int)(Math.random() * colorChoices.size()));
+					while (two == one)
+						two = colorChoices.get((int)(Math.random() * colorChoices.size()));
+					
+						computerGuess.add(one); computerGuess.add(one);
+						computerGuess.add(two); computerGuess.add(two);
+					firstGuess = false;					
+				}
 				
+				else
+				{
+					//////////////BEGIN STEP 5///////////////
+					//remove set s from master set if its code when compared to the guess returns the evaluation
+					ArrayList<ArrayList<Color>> toBeRemoved = new ArrayList<ArrayList<Color>>();
+					for (ArrayList<Color> c : masterSet)
+						if (evaluateGuess(c, computerGuess) != currentEval)
+							toBeRemoved.add(c);
+					
+					for (ArrayList<Color> c2 : toBeRemoved)
+						sSet.remove(c2);
+					
+					//////////////END STEP 5///////////////
+					
+					for (ArrayList<Color> c : masterSet)
+					{
+						
+					}
+					
+					
+				}
+				
+				currentEval = evaluateGuess(computerGuess, answer);
+				masterSet.remove(computerGuess);
 				
 				//game is over if true
 				if (computerGuess.equals(answer))
@@ -79,77 +113,35 @@ public class FiveGuessSolver {
 				System.out.println();
 		}
 	}
-	
-	@SuppressWarnings("unchecked")
-	public ArrayList<Color> calculateGuess()
-	{
-		if (guessAgain)
-		{
-			guessAgain = false;
-			bestGuess =  getNewAnswer();
-			bestEval = evaluateGuess(bestGuess, answer);
-			if (bestEval == 0)
-			{
-				for (Color c : bestGuess)
-					colorChoices.remove(c);
-				guessAgain = true;						
-			}
-			return bestGuess;
-		}
 		
-		else
-		{			
-			while (true)
-			{
-				ArrayList<Color> bestGuessTest = (ArrayList<Color>)bestGuess.clone();
-				int randomIndex = slotChoices.get((int)(Math.random() * slotChoices.size()));
-				Color randomColor = colorChoices.get((int)(Math.random() * colorChoices.size()));
-				bestGuessTest.set(randomIndex, randomColor); 
-				
-				if (!alreadyVisitedStates.contains(bestGuessTest))
-				{
-					alreadyVisitedStates.add(bestGuessTest);
-				
-					int tempEval = evaluateGuess(bestGuessTest, answer);
-						
-					if (tempEval - bestEval == -10)
-						slotChoices.remove(slotChoices.indexOf(randomIndex));
-					
-					if (tempEval > bestEval)
-					{
-						if (tempEval - bestEval == 9 || tempEval - bestEval == 10)
-							slotChoices.remove(slotChoices.indexOf(randomIndex));
-						
-						bestEval = tempEval;
-						bestGuess = bestGuessTest;							
-					}	
-					
-					
-					
-					return bestGuessTest;
-				}				
-			}
-		}
-		
-	}
-	
 	public int evaluateGuess(ArrayList<Color> guess, ArrayList<Color> answer)
 	{
+		ArrayList<Color> guessCopy = new ArrayList<Color>(guess);
+		ArrayList<Color> answerCopy = new ArrayList<Color>(answer);
+		
 		int blackPegs = 0;
 		int whitePegs = 0;
+		int numMatches = 0;
 		
 		for (int i = 0; i < numSlots; i++)
 		{
 			//Right Color, Right Position
 			if (guess.get(i) == answer.get(i))
 			{
-				blackPegs++;
+				answerCopy.remove(i - numMatches);
+				guessCopy.remove(i - numMatches);
+				numMatches++;
+				blackPegs++;			
 			}
-			
+		}	
+		
+		for (int i = 0; i < answerCopy.size(); i++)
+		{
 			//Right Color, Wrong Position
-			else if (answer.contains(guess.get(i)))
-			{				
-				whitePegs++;
+			if (guessCopy.contains(answerCopy.get(i)))
+			{
+				guessCopy.remove(answerCopy.get(i));
+				whitePegs++;			
 			}
 		}
 		
@@ -177,6 +169,29 @@ public class FiveGuessSolver {
 		colorChoices.clear();
 		for (int i = 0; i < numColors; i++)
 			colorChoices.add(Color.values()[i]);
+	}
+	
+	private void populateMasterSets()
+	{		
+		for (int i = 0; i < numColors; i++)
+		{			
+			for (int j = 0; j < numColors; j++)
+			{
+				for (int k = 0; k < numColors; k++)
+				{
+					for (int l = 0; l < numColors; l++)
+					{
+						ArrayList<Color> temp = new ArrayList<Color>();
+						temp.add(Color.values()[i]);
+						temp.add(Color.values()[j]);
+						temp.add(Color.values()[k]);
+						temp.add(Color.values()[l]);
+						masterSet.add(temp);
+					}
+				}
+			}
+		}		
+		sSet = new HashSet<ArrayList<Color>>(masterSet);
 	}
 	
 	public void printOutput()

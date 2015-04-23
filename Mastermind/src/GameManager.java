@@ -120,14 +120,21 @@ public class GameManager {
 		
 		//If not the 5-guess algorithm that uses fixed variable values, use user-defined values...
 		if (algorithmIndex != 1)
+		{
 			simState = new SimulationState(numSlots, numColors, spectateGame, numIterations);
+			//run the simulation
+			simState.runSimulation();
+			simState.printOutput();	
+		}
 		//...otherwise set those variables in the code (4slots x 6 colors)
 		else
-			simState = new SimulationState(4, 6, spectateGame, numIterations);
+		{
+			FiveGuessSolver solver = new FiveGuessSolver(spectateGame, numIterations);
+			solver.runSimulation();
+			solver.printOutput();	
+		}
 		
-		//run the simulation
-		simState.runSimulation();
-		simState.printOutput();		
+			
 
 	}
 }
