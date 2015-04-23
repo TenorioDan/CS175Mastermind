@@ -1,5 +1,5 @@
 import java.util.*;
-//gitignore test 2
+
 //Author: Joey Shepard 58868407
 public class SimulationState {
 	
