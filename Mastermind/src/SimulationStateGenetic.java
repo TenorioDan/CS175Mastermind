@@ -264,24 +264,31 @@ public class SimulationStateGenetic {
 	
 	public static int evaluateGuess(ArrayList<Color> guess, ArrayList<Color> answer)
 	{
+		ArrayList<Color> guessCopy = new ArrayList<Color>(guess);
+		ArrayList<Color> answerCopy = new ArrayList<Color>(answer);
 		int blackPegs = 0;
 		int whitePegs = 0;
-		
+		int numMatches = 0;
 		for (int i = 0; i < numSlots; i++)
 		{
 			//Right Color, Right Position
 			if (guess.get(i) == answer.get(i))
 			{
+				answerCopy.remove(i - numMatches);
+				guessCopy.remove(i - numMatches);
+				numMatches++;
 				blackPegs++;
 			}
-			
+		}
+		for (int i = 0; i < answerCopy.size(); i++)
+		{
 			//Right Color, Wrong Position
-			else if (answer.contains(guess.get(i)))
-			{				
+			if (guessCopy.contains(answerCopy.get(i)))
+			{
+				guessCopy.remove(answerCopy.get(i));
 				whitePegs++;
 			}
 		}
-		
 		return 10 * blackPegs + 1 * whitePegs;
 	}
 	
