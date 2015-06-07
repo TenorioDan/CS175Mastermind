@@ -40,8 +40,7 @@ public class GameManager {
 		//END algorithm prompt
 		
 		//the 5-guess algorithm has a fixed slot and color count (4slots x 6colors)
-		if (algorithmIndex != 1)
-		{
+		
 			//BEGIN slot count prompt
 			for(;;)
 			{
@@ -77,7 +76,7 @@ public class GameManager {
 				}
 			}
 			//END color count prompt
-		}//END IF statement
+		
 		
 		//BEGIN 'print log during simulation' prompt
 		for(;;)
@@ -119,21 +118,46 @@ public class GameManager {
 		SimulationState simState;
 		
 		//If not the 5-guess algorithm that uses fixed variable values, use user-defined values...
-		if (algorithmIndex != 1)
+		if (algorithmIndex == 2)
 		{
 			simState = new SimulationState(numSlots, numColors, spectateGame, numIterations);
 			//run the simulation
 			simState.runSimulation();
 			simState.printOutput();	
 		}
-		//...otherwise set those variables in the code (4slots x 6 colors)
-		else
+		
+		//5 guess solver
+		else if (algorithmIndex == 3)
 		{
-			FiveGuessSolver solver = new FiveGuessSolver(spectateGame, numIterations);
+			FiveGuessSolver solver = new FiveGuessSolver(numSlots, numColors, spectateGame, numIterations);
+			//solver.dynamicSetAllocation();
+			
 			solver.runSimulation();
 			solver.printOutput();	
 		}
 		
+		else if (algorithmIndex == 1)
+		{
+			for (int slot = 2; slot < 10; slot++)
+			{
+				for (int color = 2; color <= 10; color++)
+				{
+					if (color + slot < 15)
+					{
+						FiveGuessSolver solver = new FiveGuessSolver(slot, color, spectateGame, numIterations);
+						solver.runSimulation();
+						solver.printAvgOnly();
+						System.out.print(" ");		
+					}
+				}
+				System.out.println();
+			}
+			//FiveGuessSolver solver = new FiveGuessSolver(numSlots, numColors, spectateGame, numIterations);
+			//solver.dynamicSetAllocation();
+			
+			//solver.runSimulation();
+			//solver.printOutput();	
+		}
 			
 
 	}
