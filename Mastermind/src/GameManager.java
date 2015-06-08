@@ -39,8 +39,9 @@ public class GameManager {
 		}
 		//END algorithm prompt
 		
-		//the 5-guess algorithm has a fixed slot and color count (4slots x 6colors)
-		
+		//the human algorithm has a fixed slot and color count (4slots x 6colors)
+		if (algorithmIndex != 2)
+		{
 			//BEGIN slot count prompt
 			for(;;)
 			{
@@ -76,22 +77,26 @@ public class GameManager {
 				}
 			}
 			//END color count prompt
+		}//END human if
 		
-		
-		//BEGIN 'print log during simulation' prompt
-		for(;;)
+		if (algorithmIndex != 2)
 		{
-			System.out.println("Enter \"true\" to print the guess and feedback each turn, \"false\" otherwise: ");
-			try{
-			spectateGame = s.nextBoolean();
-			break;
-			}catch(Exception e)
+			//BEGIN 'print log during simulation' prompt
+			for(;;)
 			{
-				s.nextLine();
-				System.out.println("ERROR: Please enter a BOOLEAN value (true or false).");
+				System.out.println("Enter \"true\" to print the guess and feedback each turn, \"false\" otherwise: ");
+				try{
+				spectateGame = s.nextBoolean();
+				break;
+				}catch(Exception e)
+				{
+					s.nextLine();
+					System.out.println("ERROR: Please enter a BOOLEAN value (true or false).");
+				}
 			}
-		}
-		//END 'print log during simulation' prompt
+			//END 'print log during simulation' prompt
+		}//END human if
+		
 		
 		//BEGIN game loop count prompt
 		for(;;)
@@ -114,49 +119,42 @@ public class GameManager {
 		//close scanner for safe execution
 		s.close();
 		
-		//Create the simulation object	
-		SimulationState simState;
-		
-		//If not the 5-guess algorithm that uses fixed variable values, use user-defined values...
-		if (algorithmIndex == 2)
+		//genetic
+		if (algorithmIndex == 3)
 		{
-			simState = new SimulationState(numSlots, numColors, spectateGame, numIterations);
-			//run the simulation
-			simState.runSimulation();
-			simState.printOutput();	
+			SimulationStateGenetic simStateGenetic = new SimulationStateGenetic(numColors, numSlots, spectateGame, numIterations);
+		 	simStateGenetic.runSimulation();
+		 	simStateGenetic.printOutput();
 		}
 		
-		//5 guess solver
-		else if (algorithmIndex == 3)
+		//human
+		else if (algorithmIndex == 2)
 		{
-			FiveGuessSolver solver = new FiveGuessSolver(numSlots, numColors, spectateGame, numIterations);
-			//solver.dynamicSetAllocation();
-			
-			solver.runSimulation();
-			solver.printOutput();	
+			GridSolver gridSolver = new GridSolver(numIterations);
+			gridSolver.RunSimulation();
 		}
 		
+		//five guess
 		else if (algorithmIndex == 1)
 		{
-			for (int slot = 2; slot < 10; slot++)
-			{
-				for (int color = 2; color <= 10; color++)
-				{
-					if (color + slot < 15)
-					{
-						FiveGuessSolver solver = new FiveGuessSolver(slot, color, spectateGame, numIterations);
-						solver.runSimulation();
-						solver.printAvgOnly();
-						System.out.print(" ");		
-					}
-				}
-				System.out.println();
-			}
-			//FiveGuessSolver solver = new FiveGuessSolver(numSlots, numColors, spectateGame, numIterations);
-			//solver.dynamicSetAllocation();
+			//for (int slot = 2; slot < 10; slot++)
+			//{
+			//	for (int color = 2; color <= 10; color++)
+			//	{
+			//		if (color + slot < 15)
+			//		{
+			//			FiveGuessSolver solver = new FiveGuessSolver(slot, color, spectateGame, numIterations);
+			//			solver.runSimulation();
+			//			solver.printAvgOnly();
+			///			System.out.print(" ");		
+			//		}
+			//	}
+			//	System.out.println();
+			//}
 			
-			//solver.runSimulation();
-			//solver.printOutput();	
+			FiveGuessSolver solver = new FiveGuessSolver(numSlots, numColors, spectateGame, numIterations);			
+			solver.runSimulation();
+			solver.printOutput();	
 		}
 			
 

@@ -1,8 +1,6 @@
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 //Author: Joey Shepard 58868407
 public class FiveGuessSolver {
@@ -59,10 +57,6 @@ public class FiveGuessSolver {
 				
 				if (firstGuess)
 				{
-					//Color one = colorChoices.get(0);
-					//Color two = colorChoices.get(1);					
-					//computerGuess.add(one); computerGuess.add(one);
-					//computerGuess.add(two); computerGuess.add(two);
 					int slotNum = numSlots / 2 == 0 ? numSlots / 2 : (numSlots + 1) / 2;
 					
 					for (int y = 0; y < numSlots; y++)

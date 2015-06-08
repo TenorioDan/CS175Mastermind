@@ -1,6 +1,4 @@
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
 
 public class GridSolver {
 	
@@ -23,11 +21,11 @@ public class GridSolver {
 	private Color trial;
 	private Grid grid;
 	
-	public GridSolver(boolean spectateGame, int numIterations, int numColors, int numSlots){
-		this.numColors = numColors;
-		this.numSlots = numSlots;
+	public GridSolver(int numIterations){
+		this.numColors = 6;
+		GridSolver.numSlots = 4;
 		this.numIterations = numIterations;
-		this.spectateGame = spectateGame;
+		//this.spectateGame = spectateGame;
 		
 	}
 	
